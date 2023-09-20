@@ -1,12 +1,18 @@
 import React, { useState } from 'react'
-import Tree, { RawNodeDatum, TreeNodeDatum } from 'react-d3-tree'
+import Tree, {  RawNodeDatum,  TreeNodeDatum } from 'react-d3-tree'
 import { AnotherNode, TreeNodeData, treeData as initialData } from '../api/Data'
+import '../style/style.css'
 
 type RenderCustomElementType = {
   nodeDatum:TreeNodeDatum
   toggleNode:()=>void
 }
 
+type LinksInfo = {
+  source:{
+    data:AnotherNode
+  }
+}
 const getNodeColor = (nodeData:any) => {
     return nodeData.status ? "green" : "red";
 };
@@ -22,7 +28,6 @@ const doesNodeConsistChild = (node:RawNodeDatum) => {
 const customToggleNode = (toggleNode:any, nodeData:RawNodeDatum | any) => {
   if (isValidNode(nodeData) && doesNodeConsistChild(nodeData)) {
     const filteredChildren : AnotherNode[] = nodeData.children?.filter((elem : AnotherNode) => !elem.status);
-    console.log("filtered children ", filteredChildren)
     nodeData.children = filteredChildren;
   }
   toggleNode()
@@ -38,6 +43,14 @@ const renderCustomElement = ({ nodeDatum, toggleNode }:RenderCustomElementType) 
   </g>
 };
 
+const customPathClassFunc : any = (linksInfo:LinksInfo ) => {
+  const { source : { data }  } = linksInfo;
+  if (data.status  === false && doesNodeConsistChild(data)) {
+    // css class name append in link tag
+    return "path-link ";
+  }
+  return ;
+}
 
 const D31 = () => {
   const [treeData,setTreeData] = useState<TreeNodeData>(initialData);
@@ -54,7 +67,8 @@ const D31 = () => {
          zoom={0.70}
          nodeSize={{ x: 350, y: 150 }}
          enableLegacyTransitions={true}
-        shouldCollapseNeighborNodes={true}
+         shouldCollapseNeighborNodes={true}
+         pathClassFunc={customPathClassFunc}
         />
    </div>
     </>
