@@ -1,6 +1,6 @@
 import React, { useState } from 'react'
-import Tree, { TreeNodeDatum } from 'react-d3-tree'
-import { TreeNodeData, treeData as initialData } from '../api/Data'
+import Tree, { RawNodeDatum, TreeNodeDatum } from 'react-d3-tree'
+import { AnotherNode, TreeNodeData, treeData as initialData } from '../api/Data'
 
 type RenderCustomElementType = {
   nodeDatum:TreeNodeDatum
@@ -8,19 +8,31 @@ type RenderCustomElementType = {
 }
 
 const getNodeColor = (nodeData:any) => {
-  if (nodeData.status === false) {
-    return "red";
-  }
-  console.log("nodeData",nodeData)
-  return "green";
+    return nodeData.status ? "green" : "red";
 };
 
+const isValidNode = (node:RawNodeDatum) => {
+  return Object.keys(node).length ? true : false;
+}
+
+const doesNodeConsistChild = (node:RawNodeDatum) => {
+  return node.hasOwnProperty("children") ? true : false
+}
+
+const customToggleNode = (toggleNode:any, nodeData:RawNodeDatum | any) => {
+  if (isValidNode(nodeData) && doesNodeConsistChild(nodeData)) {
+    const filteredChildren : AnotherNode[] = nodeData.children?.filter((elem : AnotherNode) => !elem.status);
+    console.log("filtered children ", filteredChildren)
+    nodeData.children = filteredChildren;
+  }
+  toggleNode()
+}
+
 const renderCustomElement = ({ nodeDatum, toggleNode }:RenderCustomElementType) => {
-  console.log("")
   const nodeColor = getNodeColor(nodeDatum);
   return <g>
-    <circle r={10} fill={`${nodeColor}`} />
-    <text dy=".31em" x={15} y={-15} textAnchor="start" onClick={toggleNode} style={{fill:'white'}}>
+    <circle r={10} fill={`${nodeColor}`} stroke='none'/>
+    <text dy=".31em" x={15} y={-15} textAnchor="start" stroke="none" onClick={(e) => customToggleNode(toggleNode, nodeDatum)} style={{fill:'white'}}>
       {nodeDatum.name}
     </text>
   </g>
@@ -29,17 +41,20 @@ const renderCustomElement = ({ nodeDatum, toggleNode }:RenderCustomElementType) 
 
 const D31 = () => {
   const [treeData,setTreeData] = useState<TreeNodeData>(initialData);
-
-
   return (
     <>
     <h4 className='text-center'>D3-Tree</h4>
-    <div className="border border-1 p-2 ml-3" style={{  height: "85vh",width:"60vw"}}>
+    <div className="border border-1 p-2 ml-3" style={{  height: "85vh",width:"80vw",background:"rgba(0,0,0,0.4)"}}>
         <Tree 
          data={treeData}
          orientation='horizontal'   
-         translate={{ x: 300, y: 50 }}
-         renderCustomNodeElement={(rd3tProps) => renderCustomElement({ ...rd3tProps })}   //ts will throw error if u not return and jsx or valid react cmp
+         translate={{ x:50, y: 230 }}
+         renderCustomNodeElement={(rd3tProps) => renderCustomElement({ ...rd3tProps })} 
+         initialDepth={1}
+         zoom={0.70}
+         nodeSize={{ x: 350, y: 150 }}
+         enableLegacyTransitions={true}
+        shouldCollapseNeighborNodes={true}
         />
    </div>
     </>
