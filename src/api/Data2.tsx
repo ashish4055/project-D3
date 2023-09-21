@@ -42,8 +42,6 @@ export interface NodeData {
     detailsRoot: null | NodeData[];
 }
 
-
-
 export interface ChildrenOfChildren {
     name: string;
     // count: number;

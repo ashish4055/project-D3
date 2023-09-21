@@ -25,8 +25,8 @@ interface NodeData{
 }
 
 export interface TreeNodeData{
-    name    : string;
-    status  :boolean;
+    name      : string;
+    status    :boolean;
     children? : (TreeNodeData | NodeData)[];
 }
    

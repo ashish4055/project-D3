@@ -2,7 +2,7 @@ export interface TreeNodeData {
   id?:number | null
   name:string;
   status:boolean;
-  errors?:String
+  errors?:string
   children? : (TreeNodeData | AnotherNode)[];
 }
 
